@@ -28,19 +28,12 @@ use Beaver\Service\StorageService;
  *
  * @author You Ming
  */
-class Storage extends Facade
+final class Storage extends Facade
 {
     /**
-     * A handler for cache.
-     *
-     * @var \Beaver\Storage
+     * @inheritdoc
      */
-    protected static $handler = null;
-
-    /**
-     * Gets cache handler from cache service.
-     */
-    protected static function getHandler()
+    protected static function getAccessor()
     {
         /** @var StorageService $service */
         $service = static::$context->getService(StorageService::class);
@@ -49,17 +42,5 @@ class Storage extends Facade
         }
 
         return $service->getStorage();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected static function getAccessor()
-    {
-        if (null === static::$handler) {
-            static::$handler = static::getHandler();
-        }
-
-        return static::$handler;
     }
 }

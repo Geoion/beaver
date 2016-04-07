@@ -21,7 +21,7 @@ use Beaver\Facade;
  *
  * @author You Ming
  */
-class Registry extends Facade
+final class Registry extends Facade
 {
     /**
      * @inheritdoc

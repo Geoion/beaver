@@ -24,19 +24,12 @@ use Beaver\Service\CacheService;
  *
  * @author You Ming
  */
-class Cache extends Facade
+final class Cache extends Facade
 {
     /**
-     * A handler for cache.
-     *
-     * @var \Beaver\Cache
+     * @inheritdoc
      */
-    protected static $handler = null;
-
-    /**
-     * Gets cache handler from cache service.
-     */
-    protected static function getHandler()
+    protected static function getAccessor()
     {
         /** @var CacheService $service */
         $service = static::$context->getService(CacheService::class);
@@ -45,17 +38,5 @@ class Cache extends Facade
         }
 
         return $service->getCache();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected static function getAccessor()
-    {
-        if (null === static::$handler) {
-            static::$handler = static::getHandler();
-        }
-
-        return static::$handler;
     }
 }

@@ -46,11 +46,26 @@ class FileRegistry extends Registry
     }
 
     /**
+     * Explores input for scope and name.
+     *
+     * @param string $name
+     * @return array
+     */
+    protected function parseName($name)
+    {
+        if (false !== strpos($name, '.')) {
+            return explode('.', $name, 2);
+        } else {
+            return [$name, null];
+        }
+    }
+
+    /**
      * @inheritdoc
      */
     public function get($name, $default = null)
     {
-        list($scope, $name) = explode('.', $name, 2);
+        list($scope, $name) = $this->parseName($name);
 
         if (!isset($this->entries[$scope])) {
             $this->loadScope($scope);
@@ -64,7 +79,7 @@ class FileRegistry extends Registry
      */
     public function set($name, $value)
     {
-        list($scope, $name) = explode('.', $name, 2);
+        list($scope, $name) = $this->parseName($name);
 
         if (!isset($this->entries[$scope])) {
             $this->loadScope($scope);
@@ -78,7 +93,7 @@ class FileRegistry extends Registry
      */
     public function exist($name)
     {
-        list($scope, $name) = explode('.', $name, 2);
+        list($scope, $name) = $this->parseName($name);
 
         if (!isset($this->entries[$scope])) {
             $this->loadScope($scope);
@@ -92,7 +107,7 @@ class FileRegistry extends Registry
      */
     public function delete($name)
     {
-        list($scope, $name) = explode('.', $name, 2);
+        list($scope, $name) = $this->parseName($name);
 
         if (!isset($this->entries[$scope])) {
             $this->loadScope($scope);

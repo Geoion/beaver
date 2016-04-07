@@ -6,10 +6,11 @@ Beaver                                                                     NEWS
   . Added distributed storage support.
   . Changed open method's name to connect in cache.
   . Added file storage.
-  . Added storage server.
-  . Added facade for cache.
-  . Added facade for storage.
+  . Added storage service.
+  . Added facade for cache, storage.
   . Unregisters and stops all services when app stopped.
+  . Updates facade system for more speed and suitable.
+  . Fixed bug (FileRegistry cannot operate item with only named scope).
 
 07 Apr 2016, Beaver 0.1.0
 

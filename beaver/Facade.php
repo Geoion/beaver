@@ -30,7 +30,7 @@ class Facade
      *
      * @var array
      */
-    protected static $instances = [];
+    public static $instances = [];
 
     /**
      * Binds a context.
@@ -49,23 +49,33 @@ class Facade
      */
     protected static function swap($instance)
     {
-        $accessor = static::getAccessor();
+        $called = get_called_class();
         
-        static::$instances[$accessor] = $instance;
-        static::$context->shareInstance($accessor, $instance);
+        static::$instances[$called] = $instance;
     }
 
     /**
-     * Get the object behind the facade.
+     * Gets the object behind the facade.
      * 
      * @return object
      */
     public static function getFacadeObject()
     {
-        return static::resolveInstance(static::getAccessor());
+        $called = get_called_class();
+
+        if (!isset(static::$instances[$called])) {
+            $accessor = static::getAccessor();
+            if (!is_object($accessor)) {
+                $accessor = static::$context->get($accessor);
+            }
+
+            static::$instances[$called] = $accessor;
+        }
+
+        return static::$instances[$called];
     }
 
-        /**
+    /**
      * Gets the registered name of the component.
      *
      * @return string|object
@@ -73,25 +83,6 @@ class Facade
     protected static function getAccessor()
     {
         throw new RuntimeException('Subclass must implement getAccessor method.');
-    }
-
-    /**
-     * Resolves an instance from the container.
-     *
-     * @param string|object $accessor
-     * @return mixed
-     */
-    protected static function resolveInstance($accessor)
-    {
-        if (is_object($accessor)) {
-            return $accessor;
-        }
-
-        if (!isset(static::$instances[$accessor])) {
-            static::$instances[$accessor] = static::$context->get($accessor);
-        }
-
-        return static::$instances[$accessor];
     }
 
     /**
