@@ -23,11 +23,28 @@ abstract class Db
     use ContextInjection;
 
     /**
+     * Debug mode.
+     *
+     * @var bool
+     */
+    protected $debug = false;
+
+    /**
      * Last error message.
      *
      * @var string
      */
     protected $lastError = '';
+
+    /**
+     * Sets debug mode.
+     *
+     * @param bool $debug
+     */
+    protected function setDebug($debug)
+    {
+        $this->debug = $debug;
+    }
 
     /**
      * Connects to database server.
@@ -58,9 +75,10 @@ abstract class Db
      *
      * @param string $table
      * @param array $where
+     * @param array $options
      * @return mixed
      */
-    abstract public function count($table, $where = []);
+    abstract public function count($table, $where = [], $options = []);
 
     /**
      * Inserts an record into a table.
@@ -149,15 +167,20 @@ abstract class Db
     /**
      * Saves error message.
      *
-     * @param string $message
-     * @param Throwable $e
+     * @param string $error
      * @throws DbException
      */
-    protected function saveError($message, Throwable $e = null)
+    protected function saveError($error)
     {
-        $this->lastError = $message;
+        if ($error instanceof Throwable) {
+            $this->lastError = $error->getMessage();
+            $e = $error;
+        } else {
+            $this->lastError = $error;
+            $e = null;
+        }
         
-        if ($this->context->isDebug()) {
+        if ($this->debug) {
             throw new DbException($this->lastError, 0, $e);
         }
     }

@@ -168,8 +168,17 @@ class Beaver
         if ($this->catcher) {
             $this->catcher->handleException($exception);
         } else {
-            $this->halt($exception->getMessage(), $exception->getTraceAsString(), $exception->getFile(),
-                $exception->getLine());
+            $output = '';
+            do {
+                $class = get_class($exception);
+                $message = $exception->getMessage();
+                $file = $exception->getFile();
+                $line = $exception->getLine();
+                $traces = $exception->getTraceAsString();
+                $output .= "$class : $message\n$file Line $line\n\n$traces\n\n\n";
+            } while (null !== $exception = $exception->getPrevious());
+
+            $this->halt($output);
         }
     }
 
@@ -183,7 +192,13 @@ class Beaver
      */
     public function handleError($code, $message, $file, $line)
     {
-        $this->halt("$code: $message", null, $file, $line);
+        ob_start();
+        debug_print_backtrace();
+        $trace = ob_get_clean();
+
+        $output = "Error $code : $message\n$file Line $line\n\n$trace";
+
+        $this->halt($output);
     }
 
     /**
@@ -198,7 +213,12 @@ class Beaver
                 case E_CORE_ERROR:
                 case E_COMPILE_ERROR:
                 case E_USER_ERROR:
-                    $this->halt($e['message'], null, $e['file'], $e['line']);
+                    ob_start();
+                    debug_print_backtrace();
+                    $trace = ob_get_clean();
+
+                    $output = "Error {$e['type']} : {$e['message']}\n{$e['file']} Line {$e['line']}\n\n$trace";
+                    $this->halt($output);
                     break;
             }
         }
@@ -207,12 +227,9 @@ class Beaver
     /**
      * Halt.
      *
-     * @param string $message
-     * @param string $trace
-     * @param string $file
-     * @param int $line
+     * @param string $output
      */
-    protected function halt($message, $trace, $file, $line)
+    protected function halt($output)
     {
         ob_end_clean();
 
@@ -221,17 +238,10 @@ class Beaver
         header('Status:500 Internal Server Error');
 
         if ($this->debug) {
-            if (empty($trace)) {
-                ob_start();
-                debug_print_backtrace();
-                $trace = ob_get_clean();
-            }
-
             // Outputs error info in debug mode.
-            $message = "{$_SERVER['HTTP_HOST']}:{$_SERVER['SERVER_PORT']} {$_SERVER['REQUEST_URI']}\n\n"
-                . "{$message}\n{$file} Line {$line}\n\n{$trace}";
+            $output = "{$_SERVER['HTTP_HOST']}:{$_SERVER['SERVER_PORT']} {$_SERVER['REQUEST_URI']}\n\n$output";
 
-            echo nl2br(htmlspecialchars($message));
+            echo nl2br(htmlspecialchars($output));
         } else {
             echo 'How bigger is Beaver!';
         }
