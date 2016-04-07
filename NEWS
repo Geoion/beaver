@@ -1,0 +1,12 @@
+Beaver                                                                     NEWS
+-------------------------------------------------------------------------------
+?? ??? 2016, Beaver 0.1.1
+
+- Core:
+  . Added distributed storage support.
+  . Changed open method's name to connect in cache.
+
+07 Apr 2016, Beaver 0.1.0
+
+-------------------------------------------------------------------------------
+    NOTE: Insert NEWS from last stable release here prior to actual release!

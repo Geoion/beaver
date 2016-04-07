@@ -67,7 +67,7 @@ class CacheService extends Service
     protected function onStart()
     {
         $this->handler = $this->context->get($this->configs['class']);
-        $this->handler->open($this->configs['options']);
+        $this->handler->connect($this->configs['options']);
     }
 
     /**

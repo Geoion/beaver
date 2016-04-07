@@ -21,15 +21,15 @@ abstract class Cache
     use ContextInjection;
 
     /**
-     * Opens cache manager for using.
+     * Connects to cache server.
      *
      * @param array $options
      * @return bool
      */
-    abstract public function open(array $options = []);
+    abstract public function connect(array $options = []);
 
     /**
-     * Closes cache manager.
+     * Closes the connection to the cache server.
      */
     abstract public function close();
 

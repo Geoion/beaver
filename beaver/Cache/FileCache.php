@@ -96,7 +96,7 @@ class FileCache extends Cache
     /**
      * @inheritdoc
      */
-    public function open(array $options = [])
+    public function connect(array $options = [])
     {
         $this->directory = isset($options['directory']) ? $options['directory'] : $this->context->getCacheDir();
 
@@ -118,6 +118,8 @@ class FileCache extends Cache
         }
 
         $this->directory = realpath($this->directory) . DS;
+        
+        return true;
     }
 
     /**
