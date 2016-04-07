@@ -5,6 +5,11 @@ Beaver                                                                     NEWS
 - Core:
   . Added distributed storage support.
   . Changed open method's name to connect in cache.
+  . Added file storage.
+  . Added storage server.
+  . Added facade for cache.
+  . Added facade for storage.
+  . Unregisters and stops all services when app stopped.
 
 07 Apr 2016, Beaver 0.1.0
 

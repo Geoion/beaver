@@ -89,7 +89,8 @@ class FileCache extends Cache
      * @param string $name
      * @return string
      */
-    private function getFilePath($name) {
+    private function getFilePath($name)
+    {
         return $this->directory . $this->prefix . md5($name) . '.tmp';
     }
 

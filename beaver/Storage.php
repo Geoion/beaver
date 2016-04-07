@@ -36,7 +36,7 @@ abstract class Storage
     /**
      * Gets a list of names for all buckets.
      *
-     * @return array
+     * @return array|bool
      */
     abstract public function listBuckets();
 
@@ -47,7 +47,7 @@ abstract class Storage
      * @param string $bucket The name of bucket.
      * @param int $skip
      * @param int $limit
-     * @return array
+     * @return array|bool
      */
     abstract public function listItems($bucket, $skip = 0, $limit = -1);
 
@@ -75,7 +75,7 @@ abstract class Storage
      * @param string $bucket The name of bucket.
      * @param string $name The name of item.
      * @param string $data
-     * @return int|bool
+     * @return bool
      */
     abstract public function write($bucket, $name, $data);
 
@@ -85,7 +85,7 @@ abstract class Storage
      * @param string $bucket The name of bucket.
      * @param string $name The name of item.
      * @param string $data
-     * @return int|bool
+     * @return bool
      */
     abstract public function append($bucket, $name, $data);
 

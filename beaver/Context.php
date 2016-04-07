@@ -213,6 +213,20 @@ class Context extends Container
     }
 
     /**
+     * Unregisters all services in this context.
+     */
+    public function unregisterServices()
+    {
+        foreach ($this->services as $service) {
+            if ($service->isStarted()) {
+                $service->stop();
+            }
+        }
+
+        $this->services = [];
+    }
+
+    /**
      * Gets a service.
      *
      * @param string $service

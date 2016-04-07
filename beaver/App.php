@@ -65,6 +65,9 @@ class App
         $this->control($controller, $method);
         
         $this->onStop();
+
+        // Closes all services.
+        $this->context->unregisterServices();
     }
 
     /**
