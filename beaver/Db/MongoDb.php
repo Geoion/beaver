@@ -21,7 +21,7 @@ use MongoDB\Driver\Server;
 use MongoDB\Driver\WriteConcern;
 
 /**
- * A mongodb driver.
+ * A mongodb driver. Needs mongodb extension.
  *
  * @author You Ming
  *
@@ -421,7 +421,7 @@ class MongoDb extends Db
     {
         return $this->db . '.' . $collection;
     }
-    
+
     /**
      * Selects a server for operating.
      *
