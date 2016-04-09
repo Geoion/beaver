@@ -1,7 +1,7 @@
 {
     "name": "funcuter/beaver",
     "description": "Beaver - A framework for PHP",
-    "type": "project",
+    "type": "beaver",
     "keywords": ["framework", "beaver"],
     "homepage": "http://beaver.funcuter.com/",
     "license": "MIT",
@@ -12,7 +12,8 @@
         }
     ],
     "require": {
-        "php": ">=5.5"
+        "php": ">=5.5",
+        "composer/installers": "~1.0"
     },
     "suggest": {
         "smarty/smarty": "Required to use the Smarty template engine."

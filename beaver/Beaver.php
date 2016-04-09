@@ -23,12 +23,12 @@ class Beaver
     /**
      * The version code of Beaver.
      */
-    const VERSION = '0.1.0';
+    const VERSION = '0.1.2';
 
     /**
      * The integer version.
      */
-    const VERSION_INT = 100;
+    const VERSION_INT = 102;
 
     /**
      * Debug mode.

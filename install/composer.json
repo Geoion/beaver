@@ -1,0 +1,25 @@
+{
+    "name": "funcuter/beaver-installer",
+    "description": "A custom installer to handle deploying Beaver with Composer",
+    "keywords": ["beaver", "installer"],
+    "type": "composer-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "You Ming",
+            "email": "youming@funcuter.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5",
+        "composer-plugin-api": "~1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Beaver\\Install\\": "library"
+        }
+    },
+    "extra": {
+        "class": "Beaver\\Install\\Composer\\ComposerInstaller"
+    }
+}

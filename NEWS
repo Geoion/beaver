@@ -1,5 +1,14 @@
 Beaver                                                                     NEWS
 -------------------------------------------------------------------------------
+?? ??? 2016, Beaver 0.1.3
+
+- Core :
+    . Updated version code.
+
+- Other :
+    . Updated composer.
+    . Added composer installer.
+
 08 Apr 2016, Beaver 0.1.2
 
 - Other :
