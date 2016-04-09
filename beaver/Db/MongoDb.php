@@ -28,11 +28,6 @@ use MongoDB\Driver\WriteConcern;
  * [Options]
  *  debug           : Debug mode.
  *  servers         : An array of servers configurations.
- *      host            : The host of server.
- *      port            : The port to be connected to.
- *  server          : A server configurations.
- *      host            : The host of server.
- *      port            : The port to be connected to.
  *  username        : The username for auth.
  *  password        : The password for auth.
  *  authDb          : The database name for auth.
@@ -87,16 +82,11 @@ class MongoDb extends Db
      */
     protected function parseUri($options)
     {
-        if (isset($options['server'])) {
-            $options['servers'] = isset($options['servers']) ? array_merge($options['servers'], $options['server'])
-                : [$options['server']];
-        }
-
         $servers = [];
         if (isset($options['servers']) && $options['servers']) {
             foreach ($options['servers'] as $server) {
                 if (is_array($server)) {
-                    $servers[] = $server['host'] . ':' . $server['port'];
+                    $servers[] = $server[0] . ':' . $server[1];
                 } else {
                     $servers[] = $server;
                 }

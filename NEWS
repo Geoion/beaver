@@ -4,6 +4,7 @@ Beaver                                                                     NEWS
 
 - Cache:
   . Added a cache driver for Redis.
+  . Added a cache driver for Memcached.
 
 -------------------------------------------------------------------------------
     NOTE: Insert NEWS from last stable release here prior to actual release!

@@ -10,29 +10,30 @@
 namespace Beaver\Cache;
 
 use Beaver\Cache;
-use Redis;
+use Memcached;
 
 /**
- * A cache that caching data with a Redis server. Needs phpredis extension.
+ * A cache that caching data with a Memcached server. Needs phpredis extension.
  *
  * @author You Ming
  *
  * [Options]
- *  server      : The info for Redis server.
- *  password    : Password for auth.
- *  db          : The database number for caching.
+ *  server      : The info for Memcached server.
+ *      host        : The host name.
+ *      port        : The port number.
  *  serializer  : Type of serializer.
  *  prefix      : Prefix for all key.
  *  expiry      : Default expiry time.
+ *  compressor  : Type of compressor.
  */
-class RedisCache extends Cache
+class MemCache extends Cache
 {
     /**
-     * A handler for Redis.
+     * A handler for Memcached.
      *
-     * @var Redis
+     * @var Memcached
      */
-    protected $redis;
+    protected $memcached;
 
     /**
      * A default expiry time.
@@ -58,10 +59,10 @@ class RedisCache extends Cache
                 $result = explode(':', $server);
                 return [$result[0], (int) $result[1]];
             } else {
-                return [$server, 6379];
+                return [$server, 11211];
             }
         } else {
-            return ['127.0.0.1', 6379];
+            return ['127.0.0.1', 11211];
         }
     }
 
@@ -71,26 +72,23 @@ class RedisCache extends Cache
     public function connect(array $options = [])
     {
         $server = $this->parseServer($options);
-
-        $this->redis = new Redis();
-        if (!$this->redis->pconnect($server[0], $server[1], 0, 'cache')) {
+        
+        $this->memcached = new Memcached();
+        if (!$this->memcached->addServers($server)) {
             return false;
         }
 
-        if (isset($options['password'])) {
-            $this->redis->auth($options['password']);
-        }
-
-        if (isset($options['db'])) {
-            $this->redis->select($options['db']);
-        }
-
         if (isset($options['serializer'])) {
-            $this->redis->setOption(Redis::OPT_SERIALIZER, $options['serializer']);
+            $this->memcached->setOption(Memcached::OPT_SERIALIZER, $options['serializer']);
         }
 
         if (isset($options['prefix'])) {
-            $this->redis->setOption(Redis::OPT_PREFIX, $options['prefix']);
+            $this->memcached->setOption(Memcached::OPT_PREFIX_KEY, $options['prefix']);
+        }
+
+        if (isset($options['compressor'])) {
+            $this->memcached->setOption(Memcached::OPT_COMPRESSION, true);
+            $this->memcached->setOption(Memcached::OPT_COMPRESSION_TYPE, $options['compressor']);
         }
 
         $this->expiry = isset($options['expiry']) ? $options['expiry'] : 0;
@@ -103,7 +101,6 @@ class RedisCache extends Cache
      */
     public function close()
     {
-        $this->redis->close();
     }
 
     /**
@@ -111,9 +108,9 @@ class RedisCache extends Cache
      */
     public function get($name, $default = null)
     {
-        $value = $this->redis->get($name);
+        $value = $this->memcached->get($name);
 
-        if (false !== $value || $this->exist($name)) {
+        if (false !== $value || $this->memcached->getResultCode() != Memcached::RES_NOTFOUND) {
             return $value;
         }
 
@@ -129,11 +126,7 @@ class RedisCache extends Cache
             $expiry = $this->expiry;
         }
 
-        if ($expiry > 0) {
-            return $this->redis->setex($name, $expiry, $value);
-        } else {
-            return $this->redis->set($name, $value);
-        }
+        return $this->memcached->set($name, $value, $expiry);
     }
 
     /**
@@ -141,7 +134,7 @@ class RedisCache extends Cache
      */
     public function exist($name)
     {
-        return $this->redis->exists($name);
+        return false !== $this->memcached->get($name) || $this->memcached->getResultCode() != Memcached::RES_NOTFOUND;
     }
 
     /**
@@ -149,7 +142,7 @@ class RedisCache extends Cache
      */
     public function delete($name)
     {
-        return $this->redis->delete($name) > 0;
+        return $this->memcached->delete($name);
     }
 
     /**
@@ -157,17 +150,6 @@ class RedisCache extends Cache
      */
     public function clear()
     {
-        return $this->redis->flushDB();
-    }
-
-    /**
-     * Appends specified string to an item.
-     *
-     * @param string $name The cache name.
-     * @param string $value The value to be appended.
-     */
-    public function append($name, $value)
-    {
-        $this->redis->append($name, $value);
+        return $this->memcached->flush();
     }
 }
