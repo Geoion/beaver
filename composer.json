@@ -12,8 +12,12 @@
         }
     ],
     "require": {
-        "php": ">=5.5",
-        "funcuter/beaver-installer": "~0.1"
+        "php": ">=5.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Beaver\\": "beaver/"
+        }
     },
     "suggest": {
         "smarty/smarty": "Required to use the Smarty template engine."
