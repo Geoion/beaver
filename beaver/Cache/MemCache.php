@@ -74,7 +74,7 @@ class MemCache extends Cache
         $server = $this->parseServer($options);
         
         $this->memcached = new Memcached();
-        if (!$this->memcached->addServers($server)) {
+        if (!$this->memcached->addServer($server[0], $server[1])) {
             return false;
         }
 
