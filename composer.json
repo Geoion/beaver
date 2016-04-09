@@ -13,7 +13,7 @@
     ],
     "require": {
         "php": ">=5.5",
-        "beaver/beaver-installer": "~0.1"
+        "funcuter/beaver-installer": "~0.1"
     },
     "suggest": {
         "smarty/smarty": "Required to use the Smarty template engine."
