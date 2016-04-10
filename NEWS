@@ -2,6 +2,9 @@ Beaver                                                                     NEWS
 -------------------------------------------------------------------------------
 ?? ??? 2016, Beaver 0.2.0
 
+- Core:
+  . Context can be used for injecting any callable.
+
 - Cache:
   . Added a cache driver for Redis.
   . Added a cache driver for Memcached.

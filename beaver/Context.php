@@ -11,8 +11,6 @@ namespace Beaver;
 
 use Beaver\Http\Request;
 use Beaver\Http\Response;
-use ReflectionException;
-use ReflectionMethod;
 
 /**
  * Class to global information about runtime environment, also as a subclass
@@ -253,21 +251,7 @@ class Context extends Container
     protected function onBuilt($instance)
     {
         if (method_exists($instance, 'bindContext')) {
-            try {
-                $method = new ReflectionMethod($instance, 'bindContext');
-
-                if ($method->getNumberOfParameters() > 0) {
-                    $parameters = $method->getParameters();
-                    $arguments = ['context' => $this];
-                    $dependencies = $this->resolveDependencies($parameters, $arguments);
-
-                    $method->invokeArgs($instance, $dependencies);
-                } else {
-                    $method->invoke($instance);
-                }
-            } catch (ReflectionException $e) {
-                // Ignore
-            }
+            $this->inject([$instance, 'bindContext'], ['context' => $this]);
         }
     }
 }

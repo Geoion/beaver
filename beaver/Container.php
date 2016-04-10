@@ -11,6 +11,10 @@ namespace Beaver;
 
 use Beaver\Exception\InstantiationException;
 use ReflectionClass;
+use ReflectionException;
+use ReflectionFunction;
+use ReflectionFunctionAbstract;
+use ReflectionMethod;
 use ReflectionParameter;
 
 /**
@@ -175,6 +179,48 @@ class Container
     }
 
     /**
+     * Injects dependent parameters to a callable with container.
+     *
+     * @param callable $callable
+     * @param array $arguments
+     */
+    public function inject(callable $callable, array $arguments = [])
+    {
+        try {
+            if (is_array($callable)) {
+                $reflector = new ReflectionMethod($callable[0], $callable[1]);
+                $dependencies = $this->getDependencies($reflector, $arguments);
+                $reflector->invokeArgs($callable[0], $dependencies);
+            } elseif (is_string($callable) && strpos($callable, '::')) {
+                $reflector = new ReflectionMethod($callable);
+                $dependencies = $this->getDependencies($reflector, $arguments);
+                $reflector->invokeArgs(null, $dependencies);
+            } else {
+                $reflector = new ReflectionFunction($callable);
+                $dependencies = $this->getDependencies($reflector, $arguments);
+                $reflector->invokeArgs($dependencies);
+            }
+        } catch (ReflectionException $e) {
+            // Ignore
+        }
+    }
+
+    /**
+     * Gets all dependencies from a reflector.
+     *
+     * @param ReflectionFunctionAbstract $reflector
+     * @param array $arguments
+     * @return array
+     */
+    protected function getDependencies($reflector, $arguments)
+    {
+        $parameters = $reflector->getParameters();
+        $arguments = $this->reKeyArguments($parameters, $arguments);
+
+        return $this->resolveDependencies($parameters, $arguments);
+    }
+
+    /**
      * Gets the builder for given class.
      *
      * @param string $class
@@ -226,9 +272,7 @@ class Container
             return new $builder;
         }
 
-        $parameters = $constructor->getParameters();
-        $arguments = $this->reKeyArguments($parameters, $arguments);
-        $dependencies = $this->resolveDependencies($parameters, $arguments);
+        $dependencies = $this->getDependencies($constructor, $arguments);
 
         return $reflector->newInstanceArgs($dependencies);
     }
