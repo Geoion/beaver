@@ -21,13 +21,14 @@ use MongoDB\Driver\Server;
 use MongoDB\Driver\WriteConcern;
 
 /**
- * A mongodb driver. Needs mongodb extension.
+ * A mongodb driver.
  *
  * @author You Ming
  *
  * [Options]
  *  debug           : Debug mode.
  *  servers         : An array of servers configurations.
+ *  server          : A server configurations.
  *  username        : The username for auth.
  *  password        : The password for auth.
  *  authDb          : The database name for auth.
@@ -82,6 +83,11 @@ class MongoDb extends Db
      */
     protected function parseUri($options)
     {
+        if (isset($options['server'])) {
+            $options['servers'] = isset($options['servers']) ? array_merge($options['servers'], $options['server'])
+                : [$options['server']];
+        }
+
         $servers = [];
         if (isset($options['servers']) && $options['servers']) {
             foreach ($options['servers'] as $server) {
@@ -195,6 +201,15 @@ class MongoDb extends Db
 
     /**
      * @inheritdoc
+     *
+     * [Options]
+     *  hint (string|document): The index to use. If a document, it will be interpretted as
+     *      an index specification and a name will be generated.
+     *  limit (integer): The maximum number of documents to count.
+     *  maxTimeMS (integer): The maximum amount of time to allow the query to run.
+     *  readConcern (MongoDB\Driver\ReadConcern): Read concern. [require MongoDb >= 3.2]
+     *  readPreference (MongoDB\Driver\ReadPreference): Read preference.
+     *  skip (integer): The number of documents to skip before returning the documents.
      */
     public function count($table, $where = [], $options = [])
     {
@@ -227,6 +242,11 @@ class MongoDb extends Db
 
     /**
      * @inheritdoc
+     *
+     * [Options]
+     *  bypassDocumentValidation (boolean): If true, allows the write to opt out of document
+     *      level validation.
+     *  writeConcern (MongoDB\Driver\WriteConcern): Write concern.
      */
     public function insertOne($table, $data, $options = [])
     {
@@ -245,7 +265,7 @@ class MongoDb extends Db
         }
 
         if (null === $id) {
-            $id = is_array($data['_id']) ? $data['_id'] : $data->_id;
+            $id = is_array($data) ? $data['_id'] : $data->_id;
         }
 
         return $result->getInsertedCount() > 0 ? $id : false;
@@ -253,6 +273,14 @@ class MongoDb extends Db
 
     /**
      * @inheritdoc
+     *
+     * [Options]
+     *  bypassDocumentValidation (boolean): If true, allows the write to opt out of document
+     *      level validation.
+     *  ordered (boolean): If true, when an insert fails, return without performing the
+     *      remaining writes. If false, when a write fails, continue with the remaining
+     *      writes, if any. The default is true.
+     *  writeConcern (MongoDB\Driver\WriteConcern): Write concern.
      */
     public function insertMany($table, array $data, $options = [])
     {
@@ -267,7 +295,7 @@ class MongoDb extends Db
                 if (null !== $id) {
                     $ids[$i] = $id;
                 } else {
-                    $ids[$i] = is_array($data['_id']) ? $data['_id'] : $data->_id;
+                    $ids[$i] = is_array($document) ? $document['_id'] : $data->_id;
                 }
             }
 
@@ -283,6 +311,19 @@ class MongoDb extends Db
 
     /**
      * @inheritdoc
+     *
+     * [Options]
+     *  comment (string): Attaches a comment to the query. If "$comment" also exists in the
+     *      modifiers document, this option will take precedence.
+     *  maxTimeMS (integer): The maximum amount of time to allow the query to run. If "$maxTimeMS"
+     *      also exists in the modifiers document, this option will take precedence.
+     *  modifiers (document): Meta-operators modifying the output or behavior of a query.
+     *  projection (document): Limits the fields to return for the matching document.
+     *  readConcern (MongoDB\Driver\ReadConcern): Read concern. [require MongoDb >= 3.2]
+     *  readPreference (MongoDB\Driver\ReadPreference): Read preference.
+     *  skip (integer): The number of documents to skip before returning.
+     *  sort (document): The order in which to return matching documents. If "$orderby" also
+     *      exists in the modifiers document, this option will take precedence.
      */
     public function findOne($table, $where, $fields = [], $options = [])
     {
@@ -295,6 +336,28 @@ class MongoDb extends Db
 
     /**
      * @inheritdoc
+     *
+     * [Options]
+     *  allowPartialResults (boolean): Get partial results from a mongos if some shards are
+     *      inaccessible (instead of throwing an error).
+     *  batchSize (integer): The number of documents to return per batch.
+     *  comment (string): Attaches a comment to the query. If "$comment" also exists in the
+     *      modifiers document, this option will take precedence.
+     *  cursorType (enum): Indicates the type of cursor to use. Must be either NON_TAILABLE,
+     *      TAILABLE, or TAILABLE_AWAIT. The default is NON_TAILABLE.
+     *  limit (integer): The maximum number of documents to return.
+     *  maxTimeMS (integer): The maximum amount of time to allow the query to run. If "$maxTimeMS"
+     *      also exists in the modifiers document, this option will take precedence.
+     *  modifiers (document): Meta-operators modifying the output or behavior of a query.
+     *  noCursorTimeout (boolean): The server normally times out idle cursors after an inactivity
+     *      period (10 minutes) to prevent excess memory use. Set this option to prevent that.
+     *  oplogReplay (boolean): Internal replication use only. The driver should not set this.
+     *  projection (document): Limits the fields to return for the matching document.
+     *  readConcern (MongoDB\Driver\ReadConcern): Read concern. [require MongoDb >= 3.2]
+     *  readPreference (MongoDB\Driver\ReadPreference): Read preference.
+     *  skip (integer): The number of documents to skip before returning.
+     *  sort (document): The order in which to return matching documents. If "$orderby" also
+     *      exists in the modifiers document, this option will take precedence.
      */
     public function findMany($table, $where, $fields = [], $options = [])
     {
@@ -319,6 +382,13 @@ class MongoDb extends Db
 
     /**
      * @inheritdoc
+     *
+     * [Options]
+     *  bypassDocumentValidation (boolean): If true, allows the write to opt out of document
+     *      level validation.
+     *  upsert (boolean): When true, a new document is created if no document matches the query.
+     *      The default is false.
+     *  writeConcern (MongoDB\Driver\WriteConcern): Write concern.
      */
     public function updateOne($table, $where, $data, $options = [])
     {
@@ -329,11 +399,20 @@ class MongoDb extends Db
 
     /**
      * @inheritdoc
+     *
+     * [Options]
+     *  bypassDocumentValidation (boolean): If true, allows the write to opt out of document
+     *      level validation.
+     *  upsert (boolean): When true, a new document is created if no document matches the query.
+     *      The default is false.
+     *  writeConcern (MongoDB\Driver\WriteConcern): Write concern.
      */
     public function updateMany($table, $where, $data, $options = [])
     {
         $namespace = $this->getNamespace($table);
         $writeConcern = isset($options['writeConcern']) ? $options['writeConcern'] : $this->writeConcern;
+        $options['upsert'] = false;
+        $options['multi'] = isset($options['multi']) ? $options['multi'] : true;
 
         try {
             $bulk = new BulkWrite($options);
@@ -351,26 +430,32 @@ class MongoDb extends Db
 
     /**
      * @inheritdoc
+     *
+     * [Options]
+     *  writeConcern (MongoDB\Driver\WriteConcern): Write concern.
      */
-    public function deleteOne($table, $where, $option = [])
+    public function deleteOne($table, $where, $options = [])
     {
-        $options['justOne'] = false;
+        $options['limit'] = 1;
 
         return $this->deleteMany($table, $where, $options);
     }
 
     /**
      * @inheritdoc
+     *
+     * [Options]
+     *  writeConcern (MongoDB\Driver\WriteConcern): Write concern.
      */
-    public function deleteMany($table, $where, $option = [])
+    public function deleteMany($table, $where, $options = [])
     {
         $namespace = $this->getNamespace($table);
         $writeConcern = isset($options['writeConcern']) ? $options['writeConcern'] : $this->writeConcern;
-        $options['limit'] = isset($options['justOne']) ? ($options['justOne'] ? 1 : 0) : 0;
+        $deleteOptions = isset($options['limit']) ? ($options['limit'] ? 1 : 0) : 0;
 
         try {
             $bulk = new BulkWrite($options);
-            $bulk->delete($where, $options);
+            $bulk->delete($where, $deleteOptions);
 
             $server = $this->selectServer($options);
             $result = $server->executeBulkWrite($namespace, $bulk, $writeConcern);
@@ -380,6 +465,71 @@ class MongoDb extends Db
         }
 
         return false !== $result ? $result->getDeletedCount() : false;
+    }
+
+    /**
+     * Finds a document and modify it.
+     *
+     * [Options]
+     *  bypassDocumentValidation (boolean): If true, allows the write to opt out of document
+     *      level validation.
+     *  fields (document): Limits the fields to return for the matching document.
+     *  maxTimeMS (integer): The maximum amount of time to allow the query to run.
+     *  new (boolean): When true, returns the modified document rather than the original.
+     *      This option is ignored for remove operations. The default is false.
+     *  remove (boolean): When true, removes the matched document. This option cannot be true
+     *      if the update option is set. The default is false.
+     *  sort (document): Determines which document the operation modifies if the query selects
+     *      multiple documents.
+     *  upsert (boolean): When true, a new document is created if no document matches the query.
+     *      This option is ignored for remove operations. The default is false.
+     *  writeConcern (MongoDB\Driver\WriteConcern): Write concern. [require MongoDb >= 3.2]
+     *
+     * @param string $table
+     * @param array $where
+     * @param array $update
+     * @param array $options
+     * @return mixed
+     */
+    public function findAndModify($table, $where, $update = [], $options = [])
+    {
+        $options['query'] = $where;
+
+        if (isset($options['remove']) && $options['remove']) {
+            unset($options['update'], $options['new'], $options['upsert']);
+        } else {
+            $options['update'] = $update;
+        }
+
+        try {
+            $command = ['findAndModify' => $table];
+            if (!empty($where)) {
+                $command['query'] = $where;
+            }
+            $command = $this->applyOptionsForCommand($command, $options, ['fields', 'query', 'sort', 'update', 'new',
+                'upsert', 'remove', 'maxTimeMS', 'bypassDocumentValidation', 'writeConcern']);
+            $command = new Command($command);
+
+            $server = $this->selectServer($options);
+            $cursor = $server->executeCommand($this->db, $command);
+            $cursor->setTypeMap(self::$typeMap);
+            $result = $cursor->toArray();
+        } catch (Exception $e) {
+            $this->saveError($e);
+            return false;
+        }
+
+        if (!isset($result['value'])) {
+            return null;
+        }
+
+        if ((isset($options['upsert']) && $options['upsert']) && (!isset($options['new']) || !$options['new'])
+                && isset($result['lastErrorObject']['updatedExisting'])
+                && !$result['lastErrorObject']['updatedExisting']) {
+            return null;
+        }
+
+        return $result['value'];
     }
 
     /**
@@ -411,7 +561,7 @@ class MongoDb extends Db
     {
         return $this->db . '.' . $collection;
     }
-
+    
     /**
      * Selects a server for operating.
      *

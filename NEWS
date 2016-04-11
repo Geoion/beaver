@@ -9,5 +9,8 @@ Beaver                                                                     NEWS
   . Added a cache driver for Redis.
   . Added a cache driver for Memcached.
 
+- Db:
+  . Added new operations for MongoDb database driver.
+
 -------------------------------------------------------------------------------
     NOTE: Insert NEWS from last stable release here prior to actual release!

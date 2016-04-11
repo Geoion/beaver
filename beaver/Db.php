@@ -149,20 +149,20 @@ abstract class Db
      *
      * @param string $table
      * @param array|string $where
-     * @param array $option
+     * @param array $options
      * @return mixed
      */
-    abstract public function deleteOne($table, $where, $option = []);
+    abstract public function deleteOne($table, $where, $options = []);
 
     /**
      * Deletes records from this collection.
      *
      * @param string $table
      * @param array|string $where
-     * @param array $option
+     * @param array $options
      * @return mixed
      */
-    abstract public function deleteMany($table, $where, $option = []);
+    abstract public function deleteMany($table, $where, $options = []);
 
     /**
      * Saves error message.
