@@ -62,7 +62,7 @@ class Container
      * @param string $alias The alias for class.
      * @return string
      */
-    protected function parseAlias($alias)
+    public function parseAlias($alias)
     {
         return isset($this->aliases[$alias]) ? $this->aliases[$alias] : $alias;
     }
@@ -179,12 +179,12 @@ class Container
     }
 
     /**
-     * Injects dependent parameters to a callable with container.
+     * Injects dependent parameters to a callable with container and calls it.
      *
      * @param callable $callable
      * @param array $arguments
      */
-    public function inject(callable $callable, array $arguments = [])
+    public function invoke(callable $callable, array $arguments = [])
     {
         try {
             if (is_array($callable)) {

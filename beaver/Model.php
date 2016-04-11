@@ -25,6 +25,28 @@ class Model
     protected $data = [];
 
     /**
+     * Sets the data.
+     *
+     * @param array $data
+     * @param bool $replace If true, the old data will be replaced. If false, the new data
+     *      and the old data will be merged.
+     */
+    public function setData(array $data, $replace = true)
+    {
+        $this->data = $replace ? $data : array_merge($this->data, $data);
+    }
+
+    /**
+     * Gets all data in this model as an array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->data;
+    }
+
+    /**
      * @inheritdoc
      */
     public function __set($name, $value)

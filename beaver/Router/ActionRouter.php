@@ -30,15 +30,16 @@ class ActionRouter extends Router
             $paths[] = $this->parseName($name);
         }
 
-        $controller = null;
-        $method = null;
-
         $pieces = count($paths);
-        if ($pieces == 1) {
-            $controller = array_pop($paths);
-        } elseif ($pieces > 1) {
-            $controller = implode('\\', array_slice($paths, 0, - 1));
+        if ($pieces > 1) {
             $method = array_pop($paths);
+            $controller = implode('\\', $paths);
+        } elseif ($pieces == 1) {
+            $method = null;
+            $controller = array_pop($paths);
+        } else {
+            $method = null;
+            $controller = null;
         }
 
         $this->setResult($controller, $method);

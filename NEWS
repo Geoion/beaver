@@ -12,5 +12,7 @@ Beaver                                                                     NEWS
 - Db:
   . Added new operations for MongoDb database driver.
 
+- Router:
+  . Added a new router which dispatching Url by given rules.
 -------------------------------------------------------------------------------
     NOTE: Insert NEWS from last stable release here prior to actual release!

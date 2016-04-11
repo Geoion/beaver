@@ -251,7 +251,7 @@ class Context extends Container
     protected function onBuilt($instance)
     {
         if (method_exists($instance, 'bindContext')) {
-            $this->inject([$instance, 'bindContext'], ['context' => $this]);
+            $this->invoke([$instance, 'bindContext'], ['context' => $this]);
         }
     }
 }
