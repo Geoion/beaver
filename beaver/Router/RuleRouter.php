@@ -9,7 +9,7 @@
 
 namespace Beaver\Router;
 
-use Beaver\Cache;
+use Beaver\Http\Request;
 use Beaver\Router;
 
 /**
@@ -19,343 +19,277 @@ use Beaver\Router;
  */
 class RuleRouter extends Router
 {
+    const TYPE_MAP = 1;
+    const TYPE_STANDARD = 2;
+    const TYPE_REGEX = 3;
+
     /**
      * @inheritdoc
      */
     protected function onDispatch()
     {
-        $path = trim($_SERVER['PATH_INFO'], '/');
+        $request = $this->context->getRequest();
+        $rules = $this->getRegistry()->get('router.rules', []);
 
-        $rules = $this->getRules();
-        $result = $this->matchPath($path, $rules);
+        $result = $this->matchRules($request, $rules);
 
-        $paths = explode('/', $result[0]);
-        $pieces = count($paths);
-        if ($pieces > 1) {
-            $method = array_pop($paths);
-            $controller = implode('\\', $paths);
-        } elseif ($pieces == 1) {
-            $method = null;
-            $controller = array_pop($paths);
+        if ($result) {
+            $controller = $result[0];
+            $method = $result[1];
+
+            // Resolved request arguments.
+            $this->context->getRequest()->setAttributes($result[2], false);
         } else {
             $method = null;
             $controller = null;
         }
 
-        // Resolved request arguments.
-        $this->context->getRequest()->setAttributes($result[1], false);
-
         $this->setResult($controller, $method);
-    }
-
-    /**
-     * Gets all rules for dispatching.
-     *
-     * @return array
-     */
-    protected function getRules()
-    {
-        if ($this->context->isDebug()) {
-            /** @var Cache $cache */
-            $cache = $this->context->get('cache');
-            if ($cache) {
-                $rules = $cache->get('router.rule.rules');
-                if (null !== $rules) {
-                    return $rules;
-                }
-            }
-        }
-        
-        $rules = $this->getRegistry()->get('router.rules', []);
-        $rules = $this->parseRules($rules);
-        
-        if (isset($cache)) {
-            $cache->set('router.rule.rules', $rules);
-        }
-
-        return $rules;
     }
 
     /**
      * Gets a callable.
      *
      * @param string $callable
-     * @return array|bool
+     * @return callable|null
      */
     protected function getCallable($callable)
     {
-        if (is_string($callable)) {
-            if ($pos = strpos($callable, '.')) {
-                $name = substr($callable, 0, $pos - 1);
-                $method = substr($callable, $pos + 1);
+        if (is_string($callable) && $pos = strpos($callable, '.')) {
+            $name = substr($callable, 0, $pos - 1);
+            $method = substr($callable, $pos + 1);
 
-                $object = $this->context->get($name);
-                $callable = [$object, $method];
-            } elseif ($pos = strpos($callable, '@')) {
-                $name = substr($callable, 0, $pos - 1);
-                $method = substr($callable, $pos + 1);
-
-                $name = $this->context->parseAlias($name);
-                $callable = [$name, $method];
-            }
+            $object = $this->context->get($name);
+            $callable = [$object, $method];
         }
 
         return is_callable($callable) ? $callable : null;
     }
 
     /**
-     * Parses all rules for operation.
+     * Matches path with rules.
      *
+     * @param Request $request
      * @param array $rules
      * @return array
      */
-    protected function parseRules($rules)
+    protected function matchRules($request, $rules)
     {
-        $result = [];
+        $path = trim($_SERVER['PATH_INFO'], '/');
+        $paths = explode('/', $path);
+        $method = $request->getMethod();
 
-        foreach ($rules as $rule => $route) {
-            if (!is_array($route)) {
-                $route = [$route];
+        foreach ($rules as $rule) {
+            // Checks method.
+            if (isset($rule['method']) && !$this->checkMethod($method, $rule['method'])) {
+                continue;
             }
 
-            if (isset($route[1]) && is_string($route[1])) {
-                parse_str($route[1], $route[1]);
+            $result = false;
+            $type = isset($rule['type']) ? $rule['type'] : 'standard';
+            switch ($type) {
+                case 'map':
+                    $result = $this->matchMapRule($path, $rule);
+                    break;
+                case 'standard':
+                    $result = $this->matchSimpleRule($paths, $rule);
+                    break;
+                case 'regex':
+                    $result = $this->matchRegexRule($path, $rule);
+                    break;
             }
-            $parameters = isset($route[1]) ? $route[1] : [];
 
-            if (false !== strpos($route[0], '?')) {
-                list($route[0], $query) = explode('?', $route[0], 2);
-                if ($query) {
-                    parse_str($query, $queries);
-                    $parameters = array_merge($parameters, $queries);
-                }
-            }
-
-            if ('/' === $rule[0]) {
-                $matches = [];
-                foreach ($parameters as $name => $value) {
-                    if (is_string($value) && $value && ':' === $value[0]) {
-                        if ($pos = strpos($value, '|')) {
-                            $apply = substr($value, $pos + 1);
-                            $value = substr($value, 1, $pos - 1);
-                        }
-
-                        $value = substr($value, 1);
-                        $value = (int) $value;
-
-                        if ($value) {
-                            if (isset($apply)) {
-                                $matches[$name] = [$value, $apply];
-                            } else {
-                                $matches[$name] = $value;
-                            }
-
-                            unset($parameters[$name]);
-                        }
-                    }
-                }
-
-                $result['regex'][$rule] = [$route[0], $matches, $parameters];
-            } else {
-                if ('>' === $rule[0]) {
-                    $result['map'][$rule] = [$route[0], $parameters];
-                } else {
-                    $matches = [];
-                    foreach (explode('/', rtrim($rule, '$')) as $piece) {
-                        if (':' === $piece[0] || '[' === $piece[0]) {
-                            if ('[' === $piece[0]) {
-                                $piece = trim($piece, '[]');
-                                $optional = 2;
-                            } else {
-                                $optional = 1;
-                            }
-
-                            if ($pos = strpos($piece, '|')) {
-                                $apply = substr($piece, $pos + 1);
-                                $piece = substr($piece, 1, $pos - 1);
-                            }
-
-                            if ($pos = strpos($piece, '~')) {
-                                $filter = explode(',', substr($piece, $pos + 1));
-                                $name = substr($piece, 1, $pos - 1);
-                            } elseif ($pos = strpos($piece, '\\')) {
-                                $filter = substr($piece, $pos + 1);
-                                $name = substr($piece, 1, $pos - 1);
-
-                                if ('d' === substr($piece, -1)) {
-                                    $filter = '-d';
-                                }
-                            } else {
-                                $name = substr($piece, 1);
-                            }
-
-                            if (isset($apply)) {
-                                $filter = isset($filter) ? $filter : '-';
-                                $matches[] = [$name, $optional, $filter, $apply];
-                                unset($filter, $apply);
-                            } elseif (isset($filter)) {
-                                $matches[] = [$name, $optional, $filter];
-                                unset($filter);
-                            } else {
-                                $matches[] = [$name, $optional];
-                            }
-                        } else {
-                            $matches[] = [$piece, 0];
-                        }
-                    }
-
-                    $result['simple'][$rule] = [$route[0], $matches, $parameters];
-                }
+            if ($result) {
+                return $result;
             }
         }
 
-        return $result;
+        return false;
     }
 
     /**
-     * Matches path with rules.
+     * Checks method.
+     *
+     * @param string $method.
+     * @param string|array $methods
+     * @return bool
+     */
+    protected function checkMethod($method, $methods)
+    {
+        if (is_array($methods)) {
+            return in_array($method, $methods);
+        } else {
+            return $method = $methods;
+        }
+    }
+
+    /**
+     * Matches a map rule.
      *
      * @param string $path
-     * @param array $rules
-     * @return array
+     * @param array $rule
+     * @return array|bool
      */
-    protected function matchPath($path, $rules)
+    protected function matchMapRule($path, $rule)
     {
-        if (isset($rules['map']['>' . $path])) {
-            $path = '>' . $path;
-            $result = $rules['map'][$path][0];
-            $arguments = isset($rules['map'][$path][1]) ? $rules['map'][$path][1] : [];
-
-            return [$result, $arguments];
+        if ($path !== $rule['rule']) {
+            return false;
         }
 
-        if (isset($rules['simple'])) {
-            $paths = explode('/', $path);
-            foreach ($rules['simple'] as $rule => $route) {
-                $result = $this->matchSimpleRule($paths, $rule, $route);
-                if ($result) {
-                    return $result;
-                }
-            }
-        }
+        $controller = isset($rule['controller']) ? $rule['controller'] : null;
+        $action = isset($rule['action']) ? $rule['action'] : null;
+        $arguments = isset($rule['arguments']) ? $rule['arguments'] : [];
 
-        if (isset($rules['regex'])) {
-            foreach ($rules['regex'] as $rule => $route) {
-                $result = $this->matchRegexRule($path, $rule, $route);
-                if ($result) {
-                    return $result;
-                }
-            }
-        }
-
-        // Default.
-        return ['', []];
+        return [$controller, $action, $arguments];
     }
 
     /**
      * Matches a simple rule.
      *
      * @param array $paths
-     * @param string $rule
-     * @param array $route
+     * @param array $rule
      * @return array|bool
      */
-    protected function matchSimpleRule($paths, $rule, $route)
+    protected function matchSimpleRule($paths, $rule)
     {
-        if ('$' === substr($rule, -1) && count($route[1]) != count($paths)) {
-            return false;
-        }
+        $pieces = explode('/', $rule['rule']);
 
         $arguments = [];
-        $pos = 0;
-        foreach ($route[1] as $value) {
-            $piece = isset($paths[$pos]) ? $paths[$pos] : null;
-
-            if (0 === $value[1]) {
-                if (0 !== strcasecmp($paths[$pos], $value[0])) {
+        $value = reset($paths);
+        foreach ($pieces as $piece) {
+            if (':' !== $piece[0]) {
+                if ($value !== $piece) {
                     return false;
                 }
             } else {
-                $optional = $value[1] === 2;
-
-                if (null !== $piece) {
-                    if (isset($value[2]) && '-' !== $value[2]) { // Filter
-                        $excluded = false;
-
-                        if ('-d' === $value[2] && !preg_match('/^\d*$/', $piece)) {
-                            $excluded = true;
-                        } elseif (is_array($value[2]) && in_array($piece, $value[2])) {
-                            $excluded = true;
-                        } elseif ($filter = $this->getCallable($value[2])) {
-                            if (!call_user_func($filter, $piece, $this->context)) {
-                                $excluded = true;
-                            }
-                        }
-
-                        if ($excluded) {
-                            if ($optional) {
-                                continue;
-                            } else {
-                                return false;
-                            }
-                        }
-                    }
-
-                    if (isset($value[3]) && $apply = $this->getCallable($value[3])) {
-                        $piece = call_user_func($apply, $piece, $this->context);
-                    }
-
-                    $arguments[$value[0]] = $piece;
-
-                } elseif (!$optional) {
-                    return false;
+                if ('[' === $piece[1]) {
+                    $optional = true;
+                    $name = substr($piece, 2, -1);
+                } else {
+                    $optional = false;
+                    $name = substr($piece, 1);
                 }
+
+                if (isset($rule['parameters'][$name])) {
+                    $parameter = $rule['parameters'][$name];
+
+                    if (isset($parameter['filter']) && !$this->checkFilter($parameter['filter'], $value)) {
+                        if ($optional) {
+                            // Goto? Why not.
+                            goto next;
+                        } else {
+                            return false;
+                        }
+                    }
+
+                    if (isset($parameter['applier'])) {
+                        $value = $this->apply($parameter['applier'], $value);
+                    }
+                }
+
+                $arguments[$name] = $value;
             }
 
-            $pos++;
+            next:
+            $value = next($paths);
         }
 
-        if (isset($route[2])) {
-            $arguments = array_merge($route[2], $arguments);
+        if (false !== $value && isset($rule['full']) && $rule['full']) {
+            return false;
         }
 
-        return [$route[0], $arguments];
+        if (isset($rule['arguments'])) {
+            $arguments = array_merge($rule['arguments'], $arguments);
+        }
+
+        $controller = isset($rule['controller']) ? $rule['controller'] : null;
+        $action = isset($rule['action']) ? $rule['action'] : null;
+
+        return [$controller, $action, $arguments];
     }
 
     /**
      * Matches a regex rule.
      *
      * @param array $path
-     * @param string $rule
-     * @param array $route
+     * @param array $rule
      * @return array|bool
      */
-    protected function matchRegexRule($path, $rule, $route)
+    protected function matchRegexRule($path, $rule)
     {
-        if (preg_match($rule, $path, $matches)) {
-            $arguments = [];
+        if (preg_match($rule['rule'], $path, $matches)) {
             // Other arguments.
-            if (isset($route[2])) {
-                $arguments = $route[2];
-            }
+            $arguments = [];
+
             // Matched arguments.
-            if (isset($route[1])) {
-                foreach ($route[1] as $name => $value) {
-                    if (is_array($value)) {
-                        if (isset($value[1]) && $apply = $this->getCallable($value[1])) {
-                            $arguments[$name] = call_user_func($apply, $matches[$value[0]], $this->context);
-                        } else {
-                            $arguments[$name] = $matches[$value[0]];
+            if (isset($route['parameters'])) {
+                foreach ($route['parameters'] as $name => $parameter) {
+                    if (is_array($parameter)) {
+                        $value = $matches[$parameter['id']];
+
+                        if (isset($parameter['filter']) && !$this->checkFilter($parameter['filter'], $value)) {
+                            return false;
                         }
+                        
+                        if (isset($parameter['applier'])) {
+                            $value = $this->apply($parameter['applier'], $value);
+                        }
+
+                        $arguments[$name] = $value;
                     } else {
-                        $arguments[$name] = $matches[$value];
+                        $arguments[$name] = $matches[$parameter];
                     }
                 }
             }
 
-            return [$route[0], $arguments];
+            if (isset($rule['arguments'])) {
+                $arguments = array_merge($rule['arguments'], $arguments);
+            }
+
+            $controller = isset($rule['controller']) ? $rule['controller'] : null;
+            $action = isset($rule['action']) ? $rule['action'] : null;
+
+            return [$controller, $action, $arguments];
         } else {
             return false;
         }
+    }
+
+    /**
+     * Checks whether the value is adapted to a given filter.
+     *
+     * @param string $filter
+     * @param mixed $value
+     * @return bool
+     */
+    protected function checkFilter($filter, $value)
+    {
+        if ('-d' === $filter) {
+            return preg_match('/^\d*$/', $value);
+        } elseif (is_array($filter)) {
+            if (null !== $filter[0]) {
+                return in_array($value, $filter);
+            } else {
+                return !in_array($value, $filter);
+            }
+        }
+
+        $filter = $this->getCallable($filter);
+
+        return null === $filter || call_user_func($filter, $value);
+    }
+
+    /**
+     * Apply a value with a callable .
+     *
+     * @param string $applier
+     * @param mixed $value
+     * @return mixed
+     */
+    protected function apply($applier, $value)
+    {
+        $applier = $this->getCallable($applier);
+
+        return null === $applier ? $applier : call_user_func($applier, $value);
     }
 }
