@@ -14,5 +14,9 @@ Beaver                                                                     NEWS
 
 - Router:
   . Added a new router which dispatching Url by given rules.
+
+- Model:
+  . Added a database model.
+
 -------------------------------------------------------------------------------
     NOTE: Insert NEWS from last stable release here prior to actual release!
