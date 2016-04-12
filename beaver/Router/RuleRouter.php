@@ -9,6 +9,7 @@
 
 namespace Beaver\Router;
 
+use Beaver\Cache;
 use Beaver\Router;
 
 /**
@@ -25,9 +26,7 @@ class RuleRouter extends Router
     {
         $path = trim($_SERVER['PATH_INFO'], '/');
 
-        $rules = $this->getRegistry()->get('router.rules', []);
-        $rules = $this->parseRules($rules);
-
+        $rules = $this->getRules();
         $result = $this->matchPath($path, $rules);
 
         $paths = explode('/', $result[0]);
@@ -47,6 +46,34 @@ class RuleRouter extends Router
         $this->context->getRequest()->setAttributes($result[1], false);
 
         $this->setResult($controller, $method);
+    }
+
+    /**
+     * Gets all rules for dispatching.
+     *
+     * @return array
+     */
+    protected function getRules()
+    {
+        if ($this->context->isDebug()) {
+            /** @var Cache $cache */
+            $cache = $this->context->get('cache');
+            if ($cache) {
+                $rules = $cache->get('router.rule.rules');
+                if (null !== $rules) {
+                    return $rules;
+                }
+            }
+        }
+        
+        $rules = $this->getRegistry()->get('router.rules', []);
+        $rules = $this->parseRules($rules);
+        
+        if (isset($cache)) {
+            $cache->set('router.rule.rules', $rules);
+        }
+
+        return $rules;
     }
 
     /**
