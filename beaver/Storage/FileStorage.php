@@ -38,7 +38,7 @@ class FileStorage extends Storage
      */
     private function getFilePath($bucket, $name)
     {
-        return $this->directory . $bucket . DS . str_replace(['\\', '/'], '_', $name);
+        return $this->directory . $bucket . DIRECTORY_SEPARATOR . str_replace(['\\', '/'], '_', $name);
     }
 
     /**
@@ -59,7 +59,7 @@ class FileStorage extends Storage
             throw new StorageException("Storage directory [{$this->directory}] can not be written.");
         }
 
-        $this->directory = realpath($this->directory) . DS;
+        $this->directory = realpath($this->directory) . DIRECTORY_SEPARATOR;
 
         return true;
     }
@@ -96,7 +96,7 @@ class FileStorage extends Storage
      */
     public function listItems($bucket, $skip = 0, $limit = 0)
     {
-        $dir = $this->directory . $bucket . DS;
+        $dir = $this->directory . $bucket . DIRECTORY_SEPARATOR;
 
         if (!is_dir($dir) || !is_readable($dir)) {
             return false;
@@ -213,7 +213,7 @@ class FileStorage extends Storage
      */
     public function flush($bucket)
     {
-        $dir = $this->directory . $bucket . DS;
+        $dir = $this->directory . $bucket . DIRECTORY_SEPARATOR;
         $items = $this->listItems($bucket);
 
         foreach ($items as $item) {

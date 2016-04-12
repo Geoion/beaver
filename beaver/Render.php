@@ -47,7 +47,7 @@ abstract class Render
                 $directory = $this->context->getTemplateDir();
             }
 
-            $this->templateDirectory = rtrim($directory, DS) . DS;
+            $this->templateDirectory = rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         }
 
         return $this->templateDirectory;

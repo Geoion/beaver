@@ -9,9 +9,7 @@
 
 namespace Beaver\Facade;
 
-use Beaver\Exception\FacadeException;
 use Beaver\Facade;
-use Beaver\Service\StorageService;
 
 /**
  * A facade of storage.
@@ -35,12 +33,6 @@ final class Storage extends Facade
      */
     protected static function getAccessor()
     {
-        /** @var StorageService $service */
-        $service = static::$context->getService(StorageService::class);
-        if (null === $service) {
-            throw new FacadeException('The storage facade needs StorageService.');
-        }
-
-        return $service->getStorage();
+        return 'storage';
     }
 }

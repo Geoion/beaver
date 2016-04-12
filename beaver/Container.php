@@ -101,6 +101,17 @@ class Container
     }
 
     /**
+     * Registers an instance builder with the container as a singleton.
+     *
+     * @param string|array $class The class name.
+     * @param callable|string $builder The instance builder.
+     */
+    public function singleton($class, $builder = null)
+    {
+        $this->register($class, $builder, true);
+    }
+
+    /**
      * Registers a shared instance in the container.
      *
      * @param string|array $class
@@ -141,7 +152,7 @@ class Container
             return false;
         }
 
-        return $this->$class[$class]['share'] === true;
+        return $this->builders[$class]['share'] === true;
     }
 
     /**

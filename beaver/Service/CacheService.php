@@ -10,6 +10,7 @@
 namespace Beaver\Service;
 
 use Beaver\Cache;
+use Beaver\Exception\CacheException;
 use Beaver\Service;
 
 /**
@@ -53,12 +54,18 @@ class CacheService extends Service
      */
     protected function onRegister()
     {
-        $configs = [];
+        $configs = [
+            'class' => $this->getRegistry()->get('cache.class'),
+            'options' => $this->getRegistry()->get('cache')
+        ];
 
-        $configs['class'] = $this->getRegistry()->get('service.cache.class');
-        $configs['options'] = $this->getRegistry()->get('service.cache');
+        if (empty($configs['class'])) {
+            throw new CacheException('A class of cache must be defined in the registry.');
+        }
 
         $this->configs = $configs;
+
+        $this->provide('cache');
     }
 
     /**
@@ -76,5 +83,13 @@ class CacheService extends Service
     protected function onStop()
     {
         $this->handler->close();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function onProvide($name)
+    {
+        return $this->getCache();
     }
 }

@@ -97,8 +97,6 @@ class Beaver
 
         header('X-Powered-By: Beaver ' . self::VERSION);
 
-        define('DS', DIRECTORY_SEPARATOR);
-
         register_shutdown_function([$this, 'onShutdown']);
         set_error_handler([$this, 'handleError']);
         set_exception_handler([$this, 'handleException']);

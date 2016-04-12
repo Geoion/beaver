@@ -118,7 +118,7 @@ class FileCache extends Cache
             throw new CacheException("Cache directory [{$this->directory}] can not be written.");
         }
 
-        $this->directory = realpath($this->directory) . DS;
+        $this->directory = realpath($this->directory) . DIRECTORY_SEPARATOR;
         
         return true;
     }

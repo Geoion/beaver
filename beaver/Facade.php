@@ -49,9 +49,10 @@ class Facade
      */
     protected static function swap($instance)
     {
-        $called = get_called_class();
-        
-        static::$instances[$called] = $instance;
+        $accessor = static ::getAccessor();
+
+        static::$instances[$accessor] = $instance;
+        static::$context->shareInstance($accessor, $instance);
     }
 
     /**
@@ -61,18 +62,19 @@ class Facade
      */
     public static function getFacadeObject()
     {
-        $called = get_called_class();
+        $accessor = static::getAccessor();
 
-        if (!isset(static::$instances[$called])) {
-            $accessor = static::getAccessor();
-            if (!is_object($accessor)) {
-                $accessor = static::$context->get($accessor);
-            }
-
-            static::$instances[$called] = $accessor;
+        if (is_object($accessor)) {
+            return $accessor;
         }
 
-        return static::$instances[$called];
+        if (isset(static::$instances[$accessor])) {
+            return static::$instances[$accessor];
+        }
+
+        static::$instances[$accessor] = static::$context->get($accessor);
+
+        return static::$instances[$accessor];
     }
 
     /**

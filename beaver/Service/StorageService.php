@@ -9,6 +9,7 @@
 
 namespace Beaver\Service;
 
+use Beaver\Exception\StorageException;
 use Beaver\Storage;
 use Beaver\Service;
 
@@ -53,12 +54,18 @@ class StorageService extends Service
      */
     protected function onRegister()
     {
-        $configs = [];
+        $configs = [
+            'class' => $this->getRegistry()->get('storage.class'),
+            'options' => $this->getRegistry()->get('storage')
+        ];
 
-        $configs['class'] = $this->getRegistry()->get('service.storage.class');
-        $configs['options'] = $this->getRegistry()->get('service.storage');
+        if (empty($configs['class'])) {
+            throw new StorageException('A class of storage must be defined in the registry.');
+        }
 
         $this->configs = $configs;
+
+        $this->provide('storage');
     }
 
     /**
@@ -76,5 +83,13 @@ class StorageService extends Service
     protected function onStop()
     {
         $this->handler->close();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function onProvide($name)
+    {
+        return $this->getStorage();
     }
 }

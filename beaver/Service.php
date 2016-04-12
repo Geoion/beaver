@@ -16,7 +16,7 @@ use Beaver\Traits\ContextInjection;
  *
  * @author You Ming
  */
-class Service
+abstract class Service
 {
     use ContextInjection;
 
@@ -85,6 +85,25 @@ class Service
     }
 
     /**
+     * Provides a builder
+     *
+     * @param string $name The name of provided instance.
+     * @param bool $share If true, the instance will be shared.
+     */
+    protected function provide($name, $share = true)
+    {
+        $builder = function () use ($name) {
+            // Starts the service.
+            $this->start();
+            $instance = $this->onProvide($name);
+
+            return $instance;
+        };
+
+        $this->context->register($name, $builder, $share);
+    }
+
+    /**
      * Called when this service is registering.
      */
     protected function onRegister()
@@ -103,5 +122,16 @@ class Service
      */
     protected function onStop()
     {
+    }
+
+    /**
+     * Called when need to provide an instance.
+     *
+     * @param string $name The name of provided instance.
+     * @return object
+     */
+    protected function onProvide($name)
+    {
+        return $name;
     }
 }

@@ -4,6 +4,7 @@ Beaver                                                                     NEWS
 
 - Core:
   . Context can be used for injecting any callable.
+  . Service can provide instance to container.
 
 - Cache:
   . Added a cache driver for Redis.

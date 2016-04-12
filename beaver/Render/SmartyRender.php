@@ -65,10 +65,10 @@ class SmartyRender extends Render
         ];
         $smarty->setTemplateDir($templateDirs);
         
-        $cacheDir = Arrays::dotGet($options, 'cache.directory', $this->context->getCacheDir() . 'template' . DS);
+        $cacheDir = Arrays::dotGet($options, 'cache.directory', $this->context->getCacheDir() . 'template' . DIRECTORY_SEPARATOR);
         $smarty->setCacheDir($cacheDir);
         
-        $compileDir = Arrays::dotGet($options, 'compile.directory', $this->context->getCacheDir() . 'template_c' . DS);
+        $compileDir = Arrays::dotGet($options, 'compile.directory', $this->context->getCacheDir() . 'template_c' . DIRECTORY_SEPARATOR);
         $smarty->setCompileDir($compileDir);
     }
 }

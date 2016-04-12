@@ -13,7 +13,7 @@ use Beaver\Cache;
 use Memcached;
 
 /**
- * A cache that caching data with a Memcached server. Needs phpredis extension.
+ * A cache that caching data with a Memcached server. Needs memcached extension.
  *
  * @author You Ming
  *

@@ -103,7 +103,7 @@ class Context extends Container
                 $baseDir = __DIR__ . '/../';
             }
 
-            $this->directories['base'] = realpath($baseDir) . DS;
+            $this->directories['base'] = realpath($baseDir) . DIRECTORY_SEPARATOR;
         }
 
         return $this->directories['base'];
@@ -160,7 +160,7 @@ class Context extends Container
         if (!isset($this->directories[$name])) {
             $directory = $this->registry->get('app.directory.' . $name, $this->getBaseDir() . $name);
 
-            $this->directories[$name] = realpath($directory) . DS;
+            $this->directories[$name] = realpath($directory) . DIRECTORY_SEPARATOR;
         }
 
         return $this->directories[$name];

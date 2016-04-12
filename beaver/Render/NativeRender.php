@@ -55,8 +55,8 @@ class NativeRender extends Render
      */
     protected function getTemplatePath($theme, $template)
     {
-        $template = str_replace('/', DS, $template);
+        $template = str_replace('/', DIRECTORY_SEPARATOR, $template);
 
-        return $this->getTemplateDirectory() . $theme . DS . $template . '.' . $this->getTemplateExt();
+        return $this->getTemplateDirectory() . $theme . DIRECTORY_SEPARATOR . $template . '.' . $this->getTemplateExt();
     }
 }
