@@ -56,8 +56,6 @@ abstract class Db
 
     /**
      * Closes the database connection.
-     *
-     * @return bool
      */
     abstract public function close();
 

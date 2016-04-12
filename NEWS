@@ -19,5 +19,8 @@ Beaver                                                                     NEWS
 - Model:
   . Added a database model.
 
+- Facade:
+  . Added a facade for database operation.
+
 -------------------------------------------------------------------------------
     NOTE: Insert NEWS from last stable release here prior to actual release!

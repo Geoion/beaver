@@ -14,15 +14,15 @@ use Beaver\Facade;
 /**
  * A facade of storage.
  *
- * @method static array|bool listBuckets();
- * @method static array|bool listItems($bucket, $skip = 0, $limit = -1);
- * @method static array|bool info($bucket, $name);
- * @method static string|bool read($bucket, $name);
- * @method static bool write($bucket, $name, $data);
- * @method static bool append($bucket, $name, $data);
- * @method static bool exist($bucket, $name);
- * @method static bool delete($bucket, $name);
- * @method static bool flush($bucket);
+ * @method static array|bool listBuckets()
+ * @method static array|bool listItems($bucket, $skip = 0, $limit = -1)
+ * @method static array|bool info($bucket, $name)
+ * @method static string|bool read($bucket, $name)
+ * @method static bool write($bucket, $name, $data)
+ * @method static bool append($bucket, $name, $data)
+ * @method static bool exist($bucket, $name)
+ * @method static bool delete($bucket, $name)
+ * @method static bool flush($bucket)
  *
  * @author You Ming
  */
