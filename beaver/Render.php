@@ -29,6 +29,20 @@ abstract class Render
     protected $options = [];
 
     /**
+     * Default charset for this render.
+     *
+     * @var string
+     */
+    protected $charset = 'utf-8';
+
+    /**
+     * Default Content-Type for this render.
+     *
+     * @var string
+     */
+    protected $contentType = 'text/html';
+
+    /**
      * The directory path which storage templates.
      *
      * @var string
@@ -71,6 +85,26 @@ abstract class Render
     protected function getDefaultTheme()
     {
         return Arrays::dotGet($this->options, 'template.theme', 'default');
+    }
+
+    /**
+     * Gets the default charset for this render.
+     *
+     * @return string
+     */
+    public function getCharset()
+    {
+        return $this->charset;
+    }
+
+    /**
+     * Gets the default Content-Type for this render.
+     *
+     * @return string
+     */
+    public function getContentType()
+    {
+        return $this->contentType;
     }
 
     /**

@@ -187,8 +187,10 @@ class View implements ArrayAccess
 
         $this->onOutput($content);
 
-        $charset = isset($options['charset']) ? $options['charset'] : null;
-        $contentType = isset($options['contentType']) ? $options['contentType'] : null;
+        $render = $this->getRender();
+        $charset = isset($options['charset']) ? $options['charset'] : $render->getCharset();
+        $contentType = isset($options['contentType']) ? $options['contentType'] : $render->getContentType();
+
         $this->display($content, $charset, $contentType);
     }
 
@@ -228,14 +230,6 @@ class View implements ArrayAccess
      */
     protected function display($content, $charset = null, $contentType = null)
     {
-        if (null === $charset) {
-            $charset = $this->getRegistry()->get('view.response.charset', 'utf-8');
-        }
-
-        if (null === $contentType) {
-            $contentType = $this->getRegistry()->get('view.response.contentType', 'text/html');
-        }
-
         $cacheControl = $this->cacheControl ? $this->cacheControl
             : $this->getRegistry()->get('view.response.cacheControl', 'private');
 

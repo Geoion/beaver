@@ -22,5 +22,8 @@ Beaver                                                                     NEWS
 - Facade:
   . Added a facade for database operation.
 
+- Render:
+  . Added render for JSON.
+
 -------------------------------------------------------------------------------
     NOTE: Insert NEWS from last stable release here prior to actual release!

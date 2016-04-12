@@ -9,7 +9,7 @@
 
 namespace Beaver;
 
-use RuntimeException;
+use Beaver\Exception\FacadeException;
 
 /**
  * A facade to use instance's method as static.
@@ -84,7 +84,7 @@ class Facade
      */
     protected static function getAccessor()
     {
-        throw new RuntimeException('Subclass must implement getAccessor method.');
+        throw new FacadeException('Subclass must implement getAccessor method.');
     }
 
     /**
@@ -98,7 +98,7 @@ class Facade
         $instance = static::getFacadeObject();
         
         if (!$instance) {
-            throw new RuntimeException('A facade object has not been resolved.');
+            throw new FacadeException('A facade object has not been resolved.');
         }
         
         return call_user_func_array([$instance, $method], $arguments);
