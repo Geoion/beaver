@@ -137,10 +137,10 @@ class RuleRouter extends Router
         }
 
         $controller = isset($rule['controller']) ? $rule['controller'] : null;
-        $action = isset($rule['action']) ? $rule['action'] : null;
+        $method = isset($rule['method']) ? $rule['method'] : null;
         $arguments = isset($rule['arguments']) ? $rule['arguments'] : [];
 
-        return [$controller, $action, $arguments];
+        return [$controller, $method, $arguments];
     }
 
     /**
@@ -203,9 +203,9 @@ class RuleRouter extends Router
         }
 
         $controller = isset($rule['controller']) ? $rule['controller'] : null;
-        $action = isset($rule['action']) ? $rule['action'] : null;
+        $method = isset($rule['method']) ? $rule['method'] : null;
 
-        return [$controller, $action, $arguments];
+        return [$controller, $method, $arguments];
     }
 
     /**
@@ -247,9 +247,9 @@ class RuleRouter extends Router
             }
 
             $controller = isset($rule['controller']) ? $rule['controller'] : null;
-            $action = isset($rule['action']) ? $rule['action'] : null;
+            $method = isset($rule['method']) ? $rule['method'] : null;
 
-            return [$controller, $action, $arguments];
+            return [$controller, $method, $arguments];
         } else {
             return false;
         }
