@@ -5,6 +5,7 @@ Beaver                                                                     NEWS
 - Core:
   . Context can be used for injecting any callable.
   . Service can provide instance to container.
+  . A global catcher's class can be set in registry with name [app.catcher].
 
 - Cache:
   . Added a cache driver for Redis.

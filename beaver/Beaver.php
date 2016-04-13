@@ -113,6 +113,13 @@ class Beaver
         // Creates request and response.
         $this->context->shareInstance([Request::class => 'request'], Request::create());
         $this->context->shareInstance([Response::class => 'response'], Response::create());
+
+        // Sets global catcher.
+        $catcherClass = $this->registry->get('app.catcher');
+        if ($catcherClass) {
+            $catcher = $this->context->get($catcherClass);
+            $this->setCatcher($catcher);
+        }
     }
 
     /**
