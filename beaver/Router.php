@@ -58,13 +58,17 @@ abstract class Router
         $this->controller = null;
         $this->method = null;
 
-        $this->onDispatch();
+        $path = $_SERVER['PATH_INFO'];
+
+        $this->onDispatch($path);
     }
 
     /**
      * Called when dispatching controller.
+     *
+     * @param string $path
      */
-    protected function onDispatch()
+    protected function onDispatch($path)
     {
     }
 

@@ -26,12 +26,12 @@ class RuleRouter extends Router
     /**
      * @inheritdoc
      */
-    protected function onDispatch()
+    protected function onDispatch($path)
     {
         $request = $this->context->getRequest();
         $rules = $this->getRegistry()->get('router.rules', []);
 
-        $result = $this->matchRules($request, $rules);
+        $result = $this->matchRules($path, $request, $rules);
 
         if ($result) {
             $controller = $result[0];
@@ -69,13 +69,14 @@ class RuleRouter extends Router
     /**
      * Matches path with rules.
      *
+     * @param string $path
      * @param Request $request
      * @param array $rules
      * @return array
      */
-    protected function matchRules($request, $rules)
+    protected function matchRules($path, $request, $rules)
     {
-        $path = trim($_SERVER['PATH_INFO'], '/');
+        $path = trim($path, '/');
         $paths = explode('/', $path);
         $method = $request->getMethod();
 

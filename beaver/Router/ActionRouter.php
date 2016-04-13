@@ -21,9 +21,9 @@ class ActionRouter extends Router
     /**
      * @inheritdoc
      */
-    protected function onDispatch()
+    protected function onDispatch($path)
     {
-        $path = trim($_SERVER['PATH_INFO'], '/');
+        $path = trim($path, '/');
 
         $paths = [];
         foreach (explode('/', $path) as $name) {
