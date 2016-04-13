@@ -167,11 +167,11 @@ class Controller
         try {
             if ($m->isPublic() && !$m->isStatic()) {
                 if ($m->getNumberOfParameters() > 0
-                        && $this->getRegistry()->get('router.parameters.inject.enable', false)) {
+                        && $this->getRegistry()->get('router.parameter.inject.enable', false)) {
                     // Injects attributes.
                     $attributes = $this->context->getRequest()->getAttributes()->toArray();
                     $parameters = $m->getParameters();
-                    $injectName = $this->getRegistry()->get('router.parameters.inject.way', 'name') != 'order';
+                    $injectName = $this->getRegistry()->get('router.parameter.inject.way', 'name') != 'order';
 
                     $arguments = [];
                     foreach ($parameters as $parameter) {
