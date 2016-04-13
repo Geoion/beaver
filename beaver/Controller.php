@@ -138,6 +138,11 @@ class Controller
         $this->onCreate($method);
         
         // Checks method.
+        if (null === $method) {
+            $class = get_class($this);
+            throw new NotFoundException("Dispatched result without method in $class.");
+        }
+
         if (!method_exists($this, $method)) {
             $class = get_class($this);
             throw new NotFoundException("Method $method not found in $class.");

@@ -58,7 +58,9 @@ class App
         $this->onDispatched($controller, $method);
         
         // Checks controller.
-        if (!class_exists($controller)) {
+        if (null === $controller) {
+            throw new NotFoundException("Dispatched with none result.");
+        } elseif (!class_exists($controller)) {
             throw new NotFoundException("Controller $controller not found.");
         }
         
