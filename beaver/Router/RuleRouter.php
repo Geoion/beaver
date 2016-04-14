@@ -37,16 +37,16 @@ class RuleRouter extends Router
 
         if ($result) {
             $controller = $result[0];
-            $method = $result[1];
+            $action = $result[1];
 
             // Resolved request arguments.
             $this->context->getRequest()->setAttributes($result[2], false);
         } else {
-            $method = null;
+            $action = null;
             $controller = null;
         }
 
-        $this->setResult($controller, $method);
+        $this->setResult($controller, $action);
     }
 
     /**
@@ -78,7 +78,6 @@ class RuleRouter extends Router
      */
     protected function matchRules($path, $request, $rules)
     {
-        $path = trim($path, '/');
         $paths = explode('/', $path);
         $method = $request->getMethod();
 
@@ -95,7 +94,7 @@ class RuleRouter extends Router
                     $result = $this->matchMapRule($path, $rule);
                     break;
                 case self::TYPE_STANDARD:
-                    $result = $this->matchSimpleRule($paths, $rule);
+                    $result = $this->matchStandardRule($paths, $rule);
                     break;
                 case self::TYPE_REGEX:
                     $result = $this->matchRegexRule($path, $rule);
@@ -140,20 +139,20 @@ class RuleRouter extends Router
         }
 
         $controller = isset($rule['controller']) ? $rule['controller'] : null;
-        $method = isset($rule['method']) ? $rule['method'] : null;
+        $action = isset($rule['action']) ? $rule['action'] : null;
         $arguments = isset($rule['arguments']) ? $rule['arguments'] : [];
 
-        return [$controller, $method, $arguments];
+        return [$controller, $action, $arguments];
     }
 
     /**
-     * Matches a simple rule.
+     * Matches a standard rule.
      *
      * @param array $paths
      * @param array $rule
      * @return array|bool
      */
-    protected function matchSimpleRule($paths, $rule)
+    protected function matchStandardRule($paths, $rule)
     {
         $pieces = explode('/', $rule['rule']);
 
@@ -206,9 +205,9 @@ class RuleRouter extends Router
         }
 
         $controller = isset($rule['controller']) ? $rule['controller'] : null;
-        $method = isset($rule['method']) ? $rule['method'] : null;
+        $action = isset($rule['action']) ? $rule['action'] : null;
 
-        return [$controller, $method, $arguments];
+        return [$controller, $action, $arguments];
     }
 
     /**
@@ -250,9 +249,9 @@ class RuleRouter extends Router
             }
 
             $controller = isset($rule['controller']) ? $rule['controller'] : null;
-            $method = isset($rule['method']) ? $rule['method'] : null;
+            $action = isset($rule['action']) ? $rule['action'] : null;
 
-            return [$controller, $method, $arguments];
+            return [$controller, $action, $arguments];
         } else {
             return false;
         }
