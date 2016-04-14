@@ -36,6 +36,12 @@ class App
         // Initializes facade.
         Facade::bindContext($this->context);
 
+        // Register cookie operator.
+        $this->context->singleton([Cookie::class => 'cookie'], function ($context) {
+            $options = $context->get(Registry::class)->get('cookie');
+            return new Cookie($options);
+        });
+
         // Initializes services.
         $services = $this->getRegistry()->get('app.services', []);
         foreach ($services as $service) {
