@@ -7,6 +7,7 @@ Beaver                                                                     NEWS
   . Service can provide instance to container.
   . A global catcher's class can be set in registry with name [app.catcher].
   . Added a operator for cookies.
+  . Added a operator for sessions.
 
 - Cache:
   . Added a cache driver for Redis.
@@ -26,6 +27,9 @@ Beaver                                                                     NEWS
 
 - Render:
   . Added render for JSON.
+
+- Session:
+  . Added a session operator with MemCache.
 
 -------------------------------------------------------------------------------
     NOTE: Insert NEWS from last stable release here prior to actual release!
