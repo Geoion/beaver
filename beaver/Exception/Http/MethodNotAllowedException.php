@@ -10,19 +10,19 @@
 namespace Beaver\Exception\Http;
 
 /**
- * HTTP 404 Not Found.
+ * HTTP 405 Method Not Allowed.
  *
  * @author You Ming
  */
-class NotFoundException extends HttpException
+class MethodNotAllowedException extends HttpException
 {
     /**
      * Constructor.
-     * 
+     *
      * @param string $message
      */
     public function __construct($message = '')
     {
-        parent::__construct(404, $message);
+        parent::__construct(405, $message);
     }
 }

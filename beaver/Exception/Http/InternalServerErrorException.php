@@ -10,11 +10,11 @@
 namespace Beaver\Exception\Http;
 
 /**
- * HTTP 404 Not Found.
+ * HTTP 500 Internal Server Error.
  *
  * @author You Ming
  */
-class NotFoundException extends HttpException
+class InternalServerErrorException extends HttpException
 {
     /**
      * Constructor.
@@ -23,6 +23,6 @@ class NotFoundException extends HttpException
      */
     public function __construct($message = '')
     {
-        parent::__construct(404, $message);
+        parent::__construct(500, $message);
     }
 }

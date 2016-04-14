@@ -10,11 +10,11 @@
 namespace Beaver\Exception\Http;
 
 /**
- * HTTP 404 Not Found.
+ * HTTP 403 Forbidden.
  *
  * @author You Ming
  */
-class NotFoundException extends HttpException
+class ForbiddenException extends HttpException
 {
     /**
      * Constructor.
@@ -23,6 +23,6 @@ class NotFoundException extends HttpException
      */
     public function __construct($message = '')
     {
-        parent::__construct(404, $message);
+        parent::__construct(403, $message);
     }
 }
