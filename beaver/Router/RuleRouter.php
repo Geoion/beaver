@@ -19,9 +19,9 @@ use Beaver\Router;
  */
 class RuleRouter extends Router
 {
-    const TYPE_MAP = 1;
-    const TYPE_STANDARD = 2;
-    const TYPE_REGEX = 3;
+    const TYPE_MAP      = 'map';
+    const TYPE_STANDARD = 'standard';
+    const TYPE_REGEX    = 'regex';
 
     /**
      * @inheritdoc
@@ -89,13 +89,13 @@ class RuleRouter extends Router
             $result = false;
             $type = isset($rule['type']) ? $rule['type'] : 'standard';
             switch ($type) {
-                case 'map':
+                case self::TYPE_MAP:
                     $result = $this->matchMapRule($path, $rule);
                     break;
-                case 'standard':
+                case self::TYPE_STANDARD:
                     $result = $this->matchSimpleRule($paths, $rule);
                     break;
-                case 'regex':
+                case self::TYPE_REGEX:
                     $result = $this->matchRegexRule($path, $rule);
                     break;
             }
@@ -120,7 +120,7 @@ class RuleRouter extends Router
         if (is_array($methods)) {
             return in_array($method, $methods);
         } else {
-            return $method = $methods;
+            return $method === $methods;
         }
     }
 
