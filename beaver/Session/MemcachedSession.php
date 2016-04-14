@@ -62,6 +62,7 @@ class MemcachedSession extends Session implements SessionHandlerInterface
     public function close()
     {
         $this->handler->close();
+        return true;
     }
 
     /**
