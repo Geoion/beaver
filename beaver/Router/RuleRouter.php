@@ -28,6 +28,8 @@ class RuleRouter extends Router
      */
     protected function onDispatch($path)
     {
+        $path = trim($path, '/');
+
         $request = $this->context->getRequest();
         $rules = $this->getRegistry()->get('router.rules', []);
 
