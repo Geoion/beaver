@@ -12,7 +12,7 @@ namespace Beaver\Facade;
 use Beaver\Facade;
 
 /**
- * A facade of db.
+ * A facade of Db.
  *
  * @method static bool connect(array $options = [])
  * @method static void close()

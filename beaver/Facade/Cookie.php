@@ -12,23 +12,24 @@ namespace Beaver\Facade;
 use Beaver\Facade;
 
 /**
- * A facade of Cache.
+ * A facade of Cookie.
  *
  * @method static mixed get($name, $default = null)
- * @method static bool set($name, $value, $expiry = null)
+ * @method static bool set($name, $value ='', $expiry =null, $path =null, $domain =null, $secure =null, $httpOnly =null)
  * @method static bool exist($name)
  * @method static bool delete($name)
- * @method static bool clear()
+ * @method static void clear()
  *
  * @author You Ming
  */
-final class Cache extends Facade
+final class Cookie extends Facade
 {
     /**
      * @inheritdoc
      */
     protected static function getAccessor()
     {
-        return 'cache';
+        return 'cookie';
     }
 }
+

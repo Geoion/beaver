@@ -55,7 +55,8 @@ class Session implements ArrayAccess
     }
 
     /**
-     * 启动 SESSION
+     * Start new or resume existing session.
+     *
      * @return bool
      */
     public function start()

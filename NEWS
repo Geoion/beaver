@@ -24,12 +24,17 @@ Beaver                                                                     NEWS
 
 - Facade:
   . Added a facade for database operation.
+  . Added a facade for cookie operation.
+  . Added a facade for session operation.
 
 - Render:
   . Added render for JSON.
 
 - Session:
   . Added a session operator with MemCache.
+
+- Service:
+  . Added a session service.
 
 -------------------------------------------------------------------------------
     NOTE: Insert NEWS from last stable release here prior to actual release!

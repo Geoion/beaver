@@ -12,7 +12,7 @@ namespace Beaver\Facade;
 use Beaver\Facade;
 
 /**
- * A facade of registry.
+ * A facade of Registry.
  *
  * @method static mixed get($name, $default = null);
  * @method static void set($name, $value);

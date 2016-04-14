@@ -12,7 +12,7 @@ namespace Beaver\Facade;
 use Beaver\Facade;
 
 /**
- * A facade of storage.
+ * A facade of Storage.
  *
  * @method static array|bool listBuckets()
  * @method static array|bool listItems($bucket, $skip = 0, $limit = -1)
