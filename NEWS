@@ -8,6 +8,7 @@ Beaver                                                                     NEWS
   . A global catcher's class can be set in registry with name [app.catcher].
   . Added a operator for cookies.
   . Added a operator for sessions.
+  . Added a log driver.
 
 - Cache:
   . Added a cache driver for Redis.
@@ -26,6 +27,7 @@ Beaver                                                                     NEWS
   . Added a facade for database operation.
   . Added a facade for cookie operation.
   . Added a facade for session operation.
+  . Added a facade for logger operation.
 
 - Render:
   . Added render for JSON.
@@ -35,6 +37,10 @@ Beaver                                                                     NEWS
 
 - Service:
   . Added a session service.
+  . Added a logger service.
+
+- Logger:
+  . Added a logger with SeasLog.
 
 -------------------------------------------------------------------------------
     NOTE: Insert NEWS from last stable release here prior to actual release!

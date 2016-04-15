@@ -150,6 +150,16 @@ class Context extends Container
     }
 
     /**
+     * Gets directory for logs.
+     *
+     * @return string
+     */
+    public function getLogDir()
+    {
+        return $this->getDirectory('log');
+    }
+
+    /**
      * Gets app directory.
      *
      * @param string $name

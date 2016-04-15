@@ -79,7 +79,7 @@ class RuleRouter extends Router
     protected function matchRules($path, $request, $rules)
     {
         $paths = explode('/', $path);
-        $method = $request->getMethod();
+        $method = strtolower($request->getMethod());
 
         foreach ($rules as $rule) {
             // Checks method.

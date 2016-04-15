@@ -14,7 +14,7 @@ use Beaver\Util\Arrays;
 use Smarty;
 
 /**
- * A render adapter to Smarty.
+ * A render that adapt to Smarty.
  *
  * @author You Ming
  *
